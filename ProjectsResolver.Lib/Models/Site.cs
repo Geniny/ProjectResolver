@@ -15,5 +15,8 @@ namespace ProjectsResolver.Lib.Models
         public bool IsRunnig { get; set; }
         [JsonPropertyName("path")]
         public string Path { get; set; }
+        [JsonPropertyName("port")]
+        public string Port { get; set; }
+
     }
 }

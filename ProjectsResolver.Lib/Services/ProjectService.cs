@@ -58,12 +58,13 @@ namespace ProjectsResolver.Lib.Services
                 var sites = serverManager.Sites;
                 foreach (Microsoft.Web.Administration.Site site in sites)
                 {
-                    var siteVirtualDir = site.Applications.SingleOrDefault().VirtualDirectories.SingleOrDefault();
-
+                    var appVirtualDir = site.Applications.SingleOrDefault();
+                    var siteVirtualDir = appVirtualDir.VirtualDirectories.SingleOrDefault();
                     if (siteVirtualDir.PhysicalPath == project.PublishUrl)
                     {
                         var state = site.State == ObjectState.Started ? true : false;
-                        projectSite = new Models.Site() { Name = site.Name, IsRunnig = state, Path = siteVirtualDir.PhysicalPath };
+                        var bindings = site.Bindings.FirstOrDefault();
+                        projectSite = new Models.Site() { Name = site.Name, IsRunnig = state, Path = siteVirtualDir.PhysicalPath, Port = bindings.BindingInformation };
                         break;
                     }
                 }
@@ -101,6 +102,11 @@ namespace ProjectsResolver.Lib.Services
             }
 
             return alias.ToString();
+        }
+
+        private string GetBinding(string binding)
+        {
+            return binding;
         }
 
         private string LoadPublishVersion(string path)
@@ -141,7 +147,14 @@ namespace ProjectsResolver.Lib.Services
                         project.Name + ".exe"
                     );
                     project.PublishVersion = LoadPublishVersion(publishedProjectExePath);
-                    project.Site = this.Get(project);
+                    try
+                    {
+                        project.Site = this.Get(project);
+                    }
+                    catch (Exception ex)
+                    {
+
+                    }
                 }
             }
         }
