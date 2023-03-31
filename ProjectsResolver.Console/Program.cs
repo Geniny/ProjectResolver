@@ -79,12 +79,12 @@ void Hosts(List<CommandProperty> props)
         filter = (site) => site.IsRunnig == false;
 
 
-    var table = new ConsoleTable("Site", "Path", "Started");
+    var table = new ConsoleTable("Site", "Path", "Started", "Port");
     foreach(var project in projectService.List().Where(p => p.Site != null))
     {
         if(filter(project.Site))
         {
-            table.AddRow(project.Site.Name, project.Site.Path, project.Site.IsRunnig);
+            table.AddRow(project.Site.Name, project.Site.Path, project.Site.IsRunnig, project.Site.Port);
         }
     }
 
