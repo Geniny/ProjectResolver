@@ -1,0 +1,7 @@
+﻿{
+  "local": true,
+  "publishProfiles": {
+    "Local": "LOCALHOST",
+    "Public": "SRVSM"
+  }
+}
