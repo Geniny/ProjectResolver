@@ -1,7 +1,9 @@
-﻿using ProjectsResolver.Console.Models;
+﻿using ProjectsResolver.Console.Models.Commands;
+using ProjectsResolver.Console.Models.Properties;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -9,18 +11,27 @@ namespace ProjectsResolver.Console.Handlers
 {
     internal class CommandHandler
     {
-        public Dictionary<string, Command>? commandDictionary { get; set; }
-        public Action<List<CommandProperty>>? HelpCommand { get; set; }
-        public Action<List<CommandProperty>>? ExitCommand { get; set; }
-        public Action<List<CommandProperty>>? AppHelpCommand { get; set; }
-        public Action<List<CommandProperty>>? ClearCommand { get; set; }
+        public Dictionary<string, Command>? commandDictionary
+        {
+            get;
+        }
+        public List<Command>? commands { get; set; }
 
         private bool isStart = false;
 
         public CommandHandler()
         {
-            this.ExitCommand = this.Exit;
+            this.commandDictionary = new Dictionary<string, Command>();
+            this.commands = new List<Command>();
         }
+
+        public CommandHandler AddCommand(Command command)
+        {
+            this.commands.Add(command);
+            this.commandDictionary.Add(command.Name, command);
+            return this;
+        }
+
 
         public void Start()
         {
@@ -32,29 +43,28 @@ namespace ProjectsResolver.Console.Handlers
                 this.ReadCommand(input);
             }
         }
-
-        public string CommandHelp(string command)
+        public void Stop()
         {
-            Command commandToObserve = null;
+            this.isStart = false;
+        }
+
+        public string CommandHelp(Command command)
+        {
             var helpList = new StringBuilder();
-            commandDictionary.TryGetValue(command.ToLower(), out commandToObserve);
-            if (commandToObserve == null)
+            ;
+            if (command == null)
             {
                 return "No help info for this command";
             }
 
-            foreach (var property in commandToObserve.Properties)
+            foreach (var property in command.Properties)
             {
-                helpList.AppendLine($"\t{command} {property.Name}\t{property.Description}");
+                helpList.AppendLine($"\t{command.Name} {property.Name}\t{property.Description}");
             }
 
             return helpList.ToString();
         }
 
-        public void Exit(List<CommandProperty> props)
-        {
-            this.isStart = false;
-        }
 
         public void Execute(string command, List<string> properties)
         {
