@@ -1,10 +1,11 @@
-﻿using System;
+﻿using ProjectsResolver.Console.Models.Properties;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ProjectsResolver.Console.Models
+namespace ProjectsResolver.Console.Models.Commands
 {
     internal class Command
     {
@@ -18,9 +19,14 @@ namespace ProjectsResolver.Console.Models
             List<CommandProperty> properties
         )
         {
-            this.Action = action;
-            this.Name = name;
-            this.Properties = properties;
+            Action = action;
+            Name = name;
+            Properties = new List<CommandProperty>();
+            this.Properties.Add(new HelpProperty() { Description = "Вывести информацию о команде" });
+
+            if (properties != null && properties.Count() > 0)
+                this.Properties.Concat(properties);
+            ;
         }
     }
 }
