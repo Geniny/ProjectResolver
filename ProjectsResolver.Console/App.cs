@@ -21,12 +21,12 @@ namespace ProjectsResolver.Console
         public ProjectService ProjectService { get; set; }
         public CommandHandler CommandHandler { get; private set; }
 
-        public App(string[] args) 
+        public App(string[] args)
         {
-            this.args= args;
+            this.args = args;
         }
-        
-        public App AddSolution (string solutionJsonPath)
+
+        public App AddSolution(string solutionJsonPath)
         {
             var solutionJson = string.Empty;
 
@@ -74,7 +74,7 @@ namespace ProjectsResolver.Console
             return this;
         }
 
-        public App AddServices ()
+        public App AddServices()
         {
             if (configuration != null && solution != null)
             {
@@ -82,9 +82,13 @@ namespace ProjectsResolver.Console
                 {
                     this.ProjectService = new ProjectService(solution, configuration);
                 }
-                catch (FileNotFoundException ex)
+                catch (FileLoadException ex)
                 {
                     System.Console.WriteLine($"Неверный путь к решению / решения не найдено {ex.FileName}");
+                }
+                catch(Exception ex)
+                {
+                    System.Console.WriteLine(ex.Message);
                 }
             }
 

@@ -19,32 +19,38 @@ namespace ProjectsResolver.Lib.Data
 
         public void Load(string solutionUrl)
         {
-            var Content = File.ReadAllText(solutionUrl);
-            Regex projReg = new Regex(
-                "Project\\(\"\\{[\\w-]*\\}\"\\) = \"([\\w _]*.*)\", \"(.*\\.(cs|vcx|vb)proj)\"",
-                RegexOptions.Compiled
-            );
-            var matches = projReg.Matches(Content).Cast<Match>();
-            var Projects = matches
-                .Select(
-                    x => new Project() { Name = x.Groups[1].Value, LocalUrl = x.Groups[2].Value }
-                )
-                .ToList();
-            foreach (var project in Projects)
+            var fileInfo = new FileInfo(solutionUrl);
+            if (fileInfo.Exists)
             {
-                var localPath = project.LocalUrl;
-                project.LocalUrl = Path.GetDirectoryName(localPath);
-                var fullPath = "";
-                if (!Path.IsPathRooted(localPath))
-                    fullPath = Path.Combine(
-                        Path.GetDirectoryName(solutionUrl),
-                        project.LocalUrl
-                    );
+                var Content = File.ReadAllText(solutionUrl);
+                Regex projReg = new Regex(
+                    "Project\\(\"\\{[\\w-]*\\}\"\\) = \"([\\w _]*.*)\", \"(.*\\.(cs|vcx|vb)proj)\"",
+                    RegexOptions.Compiled
+                );
+                var matches = projReg.Matches(Content).Cast<Match>();
+                var Projects = matches
+                    .Select(
+                        x => new Project() { Name = x.Groups[1].Value, LocalUrl = x.Groups[2].Value }
+                    )
+                    .ToList();
+                foreach (var project in Projects)
+                {
+                    var localPath = project.LocalUrl;
+                    project.LocalUrl = Path.GetDirectoryName(localPath);
+                    var fullPath = "";
+                    if (!Path.IsPathRooted(localPath))
+                        fullPath = Path.Combine(
+                            Path.GetDirectoryName(solutionUrl),
+                            project.LocalUrl
+                        );
 
-                project.Url = Path.GetFullPath(fullPath);
+                    project.Url = Path.GetFullPath(fullPath);
+                }
+
+                this.Solution.Projects = Projects;
             }
+            else throw new FileLoadException($"{fileInfo.FullName} решение не найдено");
 
-            this.Solution.Projects = Projects;
         }
     }
 }

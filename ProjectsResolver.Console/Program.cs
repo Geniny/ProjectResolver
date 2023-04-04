@@ -140,4 +140,5 @@ void Help(List<CommandProperty> messages)
 void Exit (List<CommandProperty> props)
 {
     application.CommandHandler.Stop();
+    Environment.Exit(0);
 }
